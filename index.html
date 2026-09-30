@@ -1,0 +1,1146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cart Smart Market — Standalone Classroom Activity</title>
+<style>
+:root{color-scheme:light dark;--green:#247a52;--green2:#dff3e8;--ink:#17221c;--muted:#65736b;--paper:#fffdf8;--card:#ffffff;--line:#d9e2dc;--gold:#f4c95d;--danger:#b94a48;--shadow:0 5px 18px rgba(22,42,30,.08)}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:#edf3ef;color:var(--ink)}
+#app{min-height:100vh;background:light-dark(#edf3ef,#17221c);color:light-dark(var(--ink),#f4f7f4);padding:22px}
+header{max-width:1180px;margin:0 auto 18px;display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.brand{display:flex;gap:12px;align-items:center}
+.logo{width:52px;height:52px;border-radius:15px;background:var(--green);display:grid;place-items:center;font-size:27px}
+.brand h1{margin:0;font-size:27px}
+.brand p{margin:2px 0 0;color:var(--muted);font-size:14px}
+.stats{display:flex;gap:10px;align-items:stretch}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:10px 14px;min-width:118px;box-shadow:var(--shadow)}
+.stat small{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+.stat strong{font-size:20px}
+.over{color:var(--danger)!important}
+.layout{max-width:1180px;margin:auto;display:grid;grid-template-columns:minmax(0,1fr) 335px;gap:18px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:18px}
+.notice{background:var(--green2);border:1px solid #bfe3cf;border-radius:14px;padding:13px 15px;margin-bottom:15px}
+.notice b{display:block;margin-bottom:3px}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.filter{border:1px solid var(--line);background:transparent;border-radius:9px;padding:7px 11px;cursor:pointer;color:inherit}
+.filter.active{background:#eef7f1;border-color:#9bcaae;color:var(--green);font-weight:700}
+.itemCount{color:var(--muted);font-size:13px;margin:0 0 15px}
+.products{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+.product{border:1px solid var(--line);border-radius:14px;padding:13px;background:var(--card);display:flex;flex-direction:column;gap:9px}
+.pic{height:75px;border-radius:11px;background:#f4f7f3;display:grid;place-items:center;font-size:39px}
+.product h3{font-size:15px;margin:0}
+.meta{font-size:12px;color:var(--muted)}
+.price{font-size:18px;font-weight:800}
+.add{width:100%;border:0;background:var(--green);color:#fff;border-radius:9px;padding:11px;font-weight:800;cursor:pointer;display:block;visibility:visible}
+.add:hover{filter:brightness(.95)}
+.cart{position:sticky;top:14px}
+.cart h2{margin:0}
+.cartlist{margin:12px 0;max-height:360px;overflow:auto}
+.cartrow{display:grid;grid-template-columns:1fr auto;gap:8px;padding:10px 0;border-bottom:1px solid var(--line)}
+.cartrow strong{display:block;font-size:14px}
+.cartrow span{font-size:12px;color:var(--muted)}
+.controls{display:flex;align-items:center;gap:6px}
+.qty{border:1px solid var(--line);background:transparent;border-radius:7px;width:28px;height:28px;cursor:pointer;color:inherit}
+.summary{border-top:1px solid var(--line);padding-top:12px}
+.line{display:flex;justify-content:space-between;margin:7px 0}
+.checkout{width:100%;border:0;background:#17221c;color:white;border-radius:10px;padding:12px;font-weight:800;cursor:pointer;margin-top:8px}
+.clear{width:100%;background:transparent;border:1px solid var(--line);color:inherit;border-radius:10px;padding:9px;margin-top:7px;cursor:pointer}
+.view{display:none}
+.view.active{display:block}
+.stepbar{display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap}
+.step{padding:7px 10px;border-radius:999px;background:#f0f4f1;color:var(--muted);font-size:12px;font-weight:700}
+.step.active{background:var(--gold);color:#3b3112}
+.event{border:2px dashed #d6b957;background:#fff8d9;border-radius:15px;padding:16px;margin:12px 0}
+.event h2{margin-top:0}
+.answer{font-size:15px;line-height:1.55}
+.big{font-size:28px;font-weight:900}
+.success{background:#e4f5eb;border:1px solid #b8dfc7;border-radius:14px;padding:15px}
+.warn{background:#fff0ef;border:1px solid #efc2bf;border-radius:14px;padding:15px}
+@media(max-width:850px){
+#app{padding:12px}
+.layout{grid-template-columns:1fr}
+.cart{position:static}
+.stats{width:100%}
+.stat{flex:1;min-width:0}
+.stat strong{font-size:17px}
+}
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<header>
+<div class="brand">
+<div class="logo">🛒</div>
+<div>
+<h1>Cart Smart Market</h1>
+<p>Design it. Shop it. Test it. Improve it.</p>
+</div>
+</div>
+
+<div class="stats">
+<div class="stat">
+<small>Budget</small>
+<strong>$50.00</strong>
+</div>
+
+<div class="stat">
+<small>Cart total</small>
+<strong id="total">$0.00</strong>
+</div>
+
+<div class="stat">
+<small>Remaining</small>
+<strong id="remaining">$50.00</strong>
+</div>
+</div>
+</header>
+
+<div class="layout">
+
+<main class="panel">
+
+<div class="stepbar">
+<span class="step active" id="s1">1 SHOP</span>
+<span class="step" id="s2">2 CHECKOUT</span>
+<span class="step" id="s3">3 TEST</span>
+<span class="step" id="s4">4 IMPROVE</span>
+</div>
+
+<div id="shopView" class="view active">
+
+<div class="notice">
+<b>Your mission</b>
+Build a grocery basket for a family of four. Stay at or under <strong>$50.00</strong> and include a main dish, side, fruit/vegetable, drink, and dessert.
+<br>
+<small>This classroom activity runs directly in your browser. No account or outside website is required.</small>
+</div>
+
+<div class="filters" id="filters"></div>
+
+<p class="itemCount" id="itemCount"></p>
+
+<div class="products" id="products"></div>
+
+</div>
+
+<div id="checkoutView" class="view">
+
+<div class="notice">
+<b>Checkout</b>
+Review your basket. Show your decimal addition and subtraction on your paper planning sheet.
+</div>
+
+<div id="checkoutBox"></div>
+
+</div>
+
+<div id="testView" class="view">
+
+<div class="notice">
+<b>Test your design</b>
+Your first plan has been tested against a change. Use the information below to decide what needs to be redesigned.
+</div>
+
+<div class="event">
+<h2 id="eventTitle"></h2>
+<div id="eventText" class="answer"></div>
+</div>
+
+<div id="testResult"></div>
+
+</div>
+
+<div id="improveView" class="view">
+
+<div class="notice">
+<b>Improve your basket</b>
+Make at least one meaningful change, then check out again. Your goal is not simply to spend the most money—it is to meet the family's needs and stay within budget.
+</div>
+
+<div id="improveBox"></div>
+
+</div>
+
+</main>
+
+<aside class="panel cart">
+
+<h2>🛍️ My Cart</h2>
+
+<div id="cartList" class="cartlist">
+<p style="color:var(--muted)">Your cart is empty. Add some groceries!</p>
+</div>
+
+<div class="summary">
+
+<div class="line">
+<span>Total</span>
+<strong id="sideTotal">$0.00</strong>
+</div>
+
+<div class="line">
+<span>Money left</span>
+<strong id="sideRemain">$50.00</strong>
+</div>
+
+<button class="checkout" onclick="goCheckout()">
+Go to Checkout →
+</button>
+
+<button class="clear" onclick="clearCart()">
+Clear Cart
+</button>
+
+</div>
+</aside>
+
+</div>
+</div>
+
+<script>
+
+const budget=50;
+
+const testScenarios=[
+
+{
+title:'Price Increase',
+text:'The price of <b>Cereal</b> has increased from $4.75 to $5.49. Recalculate your basket and decide whether to keep cereal or replace it with another item.'
+},
+
+{
+title:'Dessert Is Out of Stock',
+text:'Your family\'s chosen <b>dessert is out of stock</b>. Remove it and choose a different dessert. Recalculate your total and make sure you still meet the family\'s needs.'
+},
+
+{
+title:'Budget Cut',
+text:'Your family just found out that they have <b>$5 less</b> to spend. Your new budget is <b>$45.00</b>. Redesign your basket so it meets the requirements and stays within the new budget.'
+},
+
+{
+title:'One More Item',
+text:'A family member asks for <b>Chocolate Chip Muffins</b> ($4.15). Add the muffins, then decide what to change if necessary to stay within your $50 budget.'
+},
+
+{
+title:'More Fruits & Vegetables',
+text:'Your family wants to eat more produce. Your basket must now include <b>at least two different fruits or vegetables</b>. Make a change if needed and stay within budget.'
+},
+
+{
+title:'Unexpected Guests',
+text:'Two grandparents are unexpectedly joining your family for dinner. Your original plan was for four people, but now you need to serve <b>six</b>. Add at least two additional grocery items without increasing the $50 budget.'
+},
+
+{
+title:'Main Dish Change',
+text:'One family member can no longer have the <b>main dish</b> you originally chose. Remove it and select a different main dish. Recalculate your total and make another change if needed.'
+},
+
+{
+title:'Not Enough Food',
+text:'Your family realizes that the original basket does not contain enough food for everyone. You <b>cannot increase the $50 budget</b>. Add at least one item by removing or replacing another item.'
+},
+
+{
+title:'Taco Night',
+text:'Your family has decided they would rather have <b>Taco Night</b>. Your redesigned basket must include the Taco Kit plus the other required categories. Stay within the $50 budget.'
+},
+
+{
+title:'Save More Money',
+text:'Your family wants to have <b>at least $8 left over</b> for another expense. Keep all required categories, but redesign your basket so the total is $42.00 or less.'
+}
+
+];
+
+let activeScenario=null;
+let testCartSnapshot=null;
+
+const items=[
+
+['Pizza','Main Dish',8.75,'🍕'],
+['Chicken','Main Dish',7.99,'🍗'],
+['Taco Kit','Main Dish',6.50,'🌮'],
+['Pasta','Main Dish',5.75,'🍝'],
+['Burgers','Main Dish',9.25,'🍔'],
+['Hot Dogs','Main Dish',5.49,'🌭'],
+['Mac & Cheese','Main Dish',4.25,'🧀'],
+['Spaghetti Sauce & Noodles','Main Dish',6.75,'🍝'],
+['Quesadillas','Main Dish',5.95,'🌯'],
+['Frozen Lasagna','Main Dish',7.49,'🥘'],
+
+['Rice','Side',2.89,'🍚'],
+['Salad','Side',3.49,'🥗'],
+['Corn','Side',1.75,'🌽'],
+['Garlic Bread','Side',2.50,'🥖'],
+['Green Beans','Side',1.99,'🫛'],
+['Mashed Potatoes','Side',2.75,'🥔'],
+['Sweet Potato Fries','Side',3.25,'🍠'],
+['Dinner Rolls','Side',2.39,'🥖'],
+
+['Apples','Fruit & Veg',3.25,'🍎'],
+['Bananas','Fruit & Veg',2.40,'🍌'],
+['Strawberries','Fruit & Veg',4.50,'🍓'],
+['Broccoli','Fruit & Veg',2.75,'🥦'],
+['Carrots','Fruit & Veg',2.29,'🥕'],
+['Grapes','Fruit & Veg',4.25,'🍇'],
+['Oranges','Fruit & Veg',3.49,'🍊'],
+['Cucumbers','Fruit & Veg',2.15,'🥒'],
+['Potatoes','Fruit & Veg',3.15,'🥔'],
+['Bell Peppers','Fruit & Veg',3.29,'🫑'],
+
+['Juice','Drink',3.50,'🧃'],
+['Lemonade','Drink',2.65,'🍋'],
+['Milk','Drink',3.25,'🥛'],
+['Water','Drink',2.25,'💧'],
+['Chocolate Milk','Drink',3.75,'🥛'],
+['Iced Tea','Drink',2.99,'🧋'],
+['Sparkling Water','Drink',3.49,'💧'],
+['Apple Juice','Drink',3.15,'🧃'],
+
+['Cookies','Dessert',2.89,'🍪'],
+['Ice Cream','Dessert',4.75,'🍦'],
+['Brownies','Dessert',3.60,'🍫'],
+['Cupcakes','Dessert',4.25,'🧁'],
+['Donuts','Dessert',3.99,'🍩'],
+['Pudding Cups','Dessert',2.75,'🍮'],
+['Fruit Pops','Dessert',3.49,'🍧'],
+['Chocolate Chip Muffins','Dessert',4.15,'🧁'],
+
+['Cereal','Pantry',4.75,'🥣'],
+['Crackers','Pantry',2.60,'🧀'],
+['Cheese','Pantry',4.85,'🧀'],
+['Popcorn','Pantry',2.99,'🍿'],
+['Peanut Butter','Pantry',3.79,'🥜'],
+['Jelly','Pantry',2.99,'🍇'],
+['Tortilla Chips','Pantry',3.49,'🌽'],
+['Granola Bars','Pantry',3.85,'🍫'],
+['Pasta Sauce','Pantry',3.25,'🍅'],
+['Canned Soup','Pantry',2.49,'🥫'],
+['Flour','Pantry',2.89,'🌾'],
+['Bread','Pantry',2.99,'🍞']
+
+];
+
+let cart=JSON.parse(localStorage.getItem('cartSmartCart')||'{}');
+let category='All';
+let phase='shop';
+
+const money=n=>'$'+n.toFixed(2);
+
+const scenarioBudget=()=>activeScenario&&activeScenario.title==='Budget Cut'?45:budget;
+
+const priceFor=i=>
+activeScenario&&
+activeScenario.title==='Price Increase'&&
+items[i][0]==='Cereal'
+?5.49
+:items[i][2];
+
+const total=()=>
+Object.entries(cart).reduce(
+(s,[i,q])=>s+priceFor(i)*q,0
+);
+
+function renderFilters(){
+
+const cats=[
+'All',
+'Main Dish',
+'Side',
+'Fruit & Veg',
+'Drink',
+'Dessert',
+'Pantry'
+];
+
+const count=c=>
+c==='All'
+?items.length
+:items.filter(x=>x[1]===c).length;
+
+document.getElementById('filters').innerHTML=
+cats.map(c=>
+`<button type="button"
+class="filter ${c===category?'active':''}"
+onclick="category='${c}';render()">
+${c} (${count(c)})
+</button>`
+).join('');
+
+}
+
+function renderProducts(){
+
+const list=
+items
+.map((x,i)=>({...x,i}))
+.filter(x=>category==='All'||x[1]===category);
+
+document.getElementById('itemCount').textContent=
+`Showing ${list.length} of ${items.length} grocery items`;
+
+document.getElementById('products').innerHTML=
+list.map(x=>
+`
+<div class="product">
+
+<div class="pic">${x[3]}</div>
+
+<div>
+<h3>${x[0]}</h3>
+<div class="meta">${x[1]}</div>
+</div>
+
+<div class="price">${money(x[2])}</div>
+
+<button type="button"
+class="add"
+onclick="add(${x.i})">
+Add to cart
+</button>
+
+</div>
+`
+).join('');
+
+}
+
+function renderCart(){
+
+let entries=Object.entries(cart);
+
+document.getElementById('cartList').innerHTML=
+entries.length
+
+?entries.map(([i,q])=>{
+let x=items[i];
+
+return `
+<div class="cartrow">
+
+<div>
+<strong>${x[3]} ${x[0]}</strong>
+<span>${money(x[2])} each</span>
+</div>
+
+<div class="controls">
+
+<button class="qty"
+onclick="change(${i},-1)">
+−
+</button>
+
+<b>${q}</b>
+
+<button class="qty"
+onclick="change(${i},1)">
++
+</button>
+
+</div>
+
+</div>
+`;
+
+}).join('')
+
+:'<p style="color:var(--muted)">Your cart is empty. Add some groceries!</p>';
+
+}
+
+function renderStats(){
+
+let b=scenarioBudget();
+let t=total();
+let r=b-t;
+
+document.querySelector('.stat strong').textContent=money(b);
+
+document.getElementById('total').textContent=
+money(t);
+
+document.getElementById('sideTotal').textContent=
+money(t);
+
+document.getElementById('remaining').textContent=
+money(r);
+
+document.getElementById('sideRemain').textContent=
+money(r);
+
+document.getElementById('remaining')
+.classList.toggle('over',r<0);
+
+document.getElementById('sideRemain')
+.classList.toggle('over',r<0);
+
+}
+
+function render(){
+
+renderFilters();
+renderProducts();
+renderCart();
+renderStats();
+
+}
+
+function save(){
+
+localStorage.setItem(
+'cartSmartCart',
+JSON.stringify(cart)
+);
+
+}
+
+function add(i){
+
+cart[i]=(cart[i]||0)+1;
+
+save();
+render();
+
+}
+
+function change(i,d){
+
+cart[i]+=d;
+
+if(cart[i]<=0)
+delete cart[i];
+
+save();
+render();
+
+}
+
+function clearCart(){
+
+cart={};
+
+save();
+render();
+
+}
+
+function show(view){
+
+document
+.querySelectorAll('.view')
+.forEach(x=>x.classList.remove('active'));
+
+document
+.getElementById(view+'View')
+.classList.add('active');
+
+['s1','s2','s3','s4']
+.forEach((s,j)=>
+document
+.getElementById(s)
+.classList.toggle(
+'active',
+j===({
+shop:0,
+checkout:1,
+test:2,
+improve:3
+}[view])
+)
+);
+
+phase=view;
+
+}
+
+function requirements(){
+
+let cats=
+Object.entries(cart)
+.map(([i])=>items[i][1]);
+
+return {
+
+main:cats.includes('Main Dish'),
+
+side:cats.includes('Side'),
+
+produce:cats.includes('Fruit & Veg'),
+
+drink:cats.includes('Drink'),
+
+dessert:cats.includes('Dessert')
+
+};
+
+}
+
+function scenarioCheck(){
+
+if(!activeScenario||!testCartSnapshot)
+return[];
+
+let issues=[];
+let title=activeScenario.title;
+let b=scenarioBudget();
+
+if(total()>b)
+issues.push(
+`Your basket is over the ${money(b)} budget.`
+);
+
+if(title==='Dessert Is Out of Stock'){
+
+let oldDessert=
+Object.keys(testCartSnapshot)
+.find(i=>
+items[i][1]==='Dessert'&&
+testCartSnapshot[i]>0
+);
+
+if(oldDessert&&cart[oldDessert])
+issues.push(
+'Your original dessert is still in the basket. Choose a different dessert.'
+);
+
+}
+
+if(title==='One More Item'){
+
+let muffin=
+items.findIndex(
+x=>x[0]==='Chocolate Chip Muffins'
+);
+
+if(!cart[muffin])
+issues.push(
+'Add Chocolate Chip Muffins to your redesigned basket.'
+);
+
+}
+
+if(title==='More Fruits & Vegetables'){
+
+let produce=
+Object.keys(cart)
+.filter(i=>
+items[i][1]==='Fruit & Veg'&&
+cart[i]>0
+);
+
+if(produce.length<2)
+issues.push(
+'Include at least two different fruits or vegetables.'
+);
+
+}
+
+if(title==='Unexpected Guests'){
+
+let before=
+Object.values(testCartSnapshot)
+.reduce((a,b)=>a+b,0);
+
+let after=
+Object.values(cart)
+.reduce((a,b)=>a+b,0);
+
+if(after<before+2)
+issues.push(
+'Add at least two additional grocery items for the two guests.'
+);
+
+}
+
+if(title==='Main Dish Change'){
+
+let oldMain=
+Object.keys(testCartSnapshot)
+.find(i=>
+items[i][1]==='Main Dish'&&
+testCartSnapshot[i]>0
+);
+
+let newMain=
+Object.keys(cart)
+.find(i=>
+items[i][1]==='Main Dish'&&
+cart[i]>0
+);
+
+if(!newMain)
+issues.push(
+'Choose a main dish.'
+);
+
+else if(oldMain===newMain)
+issues.push(
+'Replace your original main dish with a different main dish.'
+);
+
+}
+
+if(title==='Not Enough Food'){
+
+let removed=
+Object.keys(testCartSnapshot)
+.some(i=>
+(testCartSnapshot[i]||0)>
+(cart[i]||0)
+);
+
+let added=
+Object.keys(cart)
+.some(i=>
+(cart[i]||0)>
+(testCartSnapshot[i]||0)
+);
+
+if(!removed||!added)
+issues.push(
+'Add at least one item and remove or replace at least one original item.'
+);
+
+}
+
+if(title==='Taco Night'){
+
+let taco=
+items.findIndex(
+x=>x[0]==='Taco Kit'
+);
+
+if(!cart[taco])
+issues.push(
+'Include the Taco Kit in your redesigned basket.'
+);
+
+}
+
+if(title==='Save More Money'&&total()>42)
+
+issues.push(
+'Reduce your basket to $42.00 or less.'
+);
+
+return issues;
+
+}
+
+function goCheckout(){
+
+if(!Object.keys(cart).length){
+
+alert(
+'Add some groceries before checking out.'
+);
+
+return;
+
+}
+
+show('checkout');
+
+let t=total();
+let b=scenarioBudget();
+let r=b-t;
+let req=requirements();
+
+let missing=
+Object.entries(req)
+.filter(x=>!x[1])
+.map(x=>({
+main:'main dish',
+side:'side',
+produce:'fruit or vegetable',
+drink:'drink',
+dessert:'dessert'
+}[x[0]]));
+
+let issues=scenarioCheck();
+
+let ready=
+r>=0&&
+!missing.length&&
+(!activeScenario||!issues.length);
+
+document.getElementById('checkoutBox').innerHTML=
+
+`
+<div class="${r>=0?'success':'warn'}">
+
+<div class="big">
+${money(t)}
+</div>
+
+<p>
+<b>Total grocery cost</b>
+</p>
+
+<p>
+${
+r>=0
+?'You are within budget.'
+:'You are over budget by '+money(Math.abs(r))+'.'
+}
+</p>
+
+</div>
+
+${
+activeScenario
+?
+`
+<div class="event">
+
+<h3>${activeScenario.title}</h3>
+
+<p>
+${activeScenario.text}
+</p>
+
+</div>
+`
+:''
+}
+
+<h3>Requirement check</h3>
+
+<p>
+${
+missing.length
+?
+'You still need: <b>'+
+missing.join(', ')+
+'</b>.'
+:
+'All required categories are represented.'
+}
+</p>
+
+${
+activeScenario
+?
+`
+<h3>Scenario check</h3>
+
+<p>
+
+${
+issues.length
+?
+'<b>Keep improving:</b></p><ul>'+
+issues.map(x=>`<li>${x}</li>`).join('')+
+'</ul>'
+:
+'<b>Your basket responds to the assigned scenario.</b>'
+}
+
+`
+:''
+}
+
+<h3>Your math</h3>
+
+<p>
+Show your addition and subtraction on your paper planning sheet.
+</p>
+
+${
+phase==='improve'&&!ready
+?
+'<p class="warn">Make the needed changes before finishing your redesign.</p>'
+:''
+}
+
+<button class="checkout"
+onclick="${
+activeScenario&&phase==='improve'
+?'finishImprove()'
+:'startTest()'
+}">
+
+${
+activeScenario&&phase==='improve'
+?
+(
+ready
+?
+'Finish My Improved Basket →'
+:
+'Keep Improving →'
+)
+:
+'Test My Design →'
+}
+
+</button>
+`;
+
+}
+
+function startTest(){
+
+let req=requirements();
+
+if(
+total()>budget||
+Object.values(req).some(x=>!x)
+){
+
+let missing=
+Object.entries(req)
+.filter(x=>!x[1])
+.map(x=>({
+main:'main dish',
+side:'side',
+produce:'fruit or vegetable',
+drink:'drink',
+dessert:'dessert'
+}[x[0]]));
+
+document.getElementById('eventTitle')
+.textContent=
+'🚨 Finish Your Original Basket';
+
+document.getElementById('eventText')
+.innerHTML=
+`
+${
+total()>budget
+?
+`Your basket is <b>${money(total()-budget)}</b> over the $50.00 budget. `
+:''
+}
+
+${
+missing.length
+?
+`You still need: <b>${missing.join(', ')}</b>.`
+:''
+}
+
+Complete your original design before testing it.
+`;
+
+document.getElementById('testResult')
+.innerHTML=
+`
+<div class="warn">
+Return to the market and finish your basket.
+</div>
+
+<button class="checkout"
+onclick="show('shop')">
+Back to Market
+</button>
+`;
+
+}
+
+else{
+
+activeScenario=
+testScenarios[
+Math.floor(
+Math.random()*testScenarios.length
+)
+];
+
+testCartSnapshot=
+JSON.parse(
+JSON.stringify(cart)
+);
+
+document.getElementById('eventTitle')
+.textContent=
+'🚨 '+activeScenario.title;
+
+document.getElementById('eventText')
+.innerHTML=
+activeScenario.text;
+
+document.getElementById('testResult')
+.innerHTML=
+`
+<p>
+<b>Your task:</b>
+Use this new information to decide what should change.
+Then click Improve My Basket.
+</p>
+
+<button class="checkout"
+onclick="openImprove()">
+Improve My Basket →
+</button>
+`;
+
+}
+
+show('test');
+renderStats();
+
+}
+
+function openImprove(){
+
+show('improve');
+
+let scenarioText=
+activeScenario
+?
+`
+<div class="event">
+
+<h3>
+Your Assigned Challenge:
+${activeScenario.title}
+</h3>
+
+<p>
+${activeScenario.text}
+</p>
+
+</div>
+`
+:'';
+
+document.getElementById('improveBox')
+.innerHTML=
+`
+
+${scenarioText}
+
+<h3>
+Make at least one change
+</h3>
+
+<p>
+Use the market to add, remove, or replace items.
+Your goal is to redesign your basket so that it responds to your assigned challenge.
+</p>
+
+<ol>
+
+<li>
+Change your basket.
+</li>
+
+<li>
+Calculate your new total.
+</li>
+
+<li>
+Calculate how much money remains.
+</li>
+
+<li>
+Check that your family requirements are met.
+</li>
+
+<li>
+Be ready to explain why your change improved your basket.
+</li>
+
+</ol>
+
+<button class="checkout"
+onclick="goCheckout()">
+Recalculate My Basket →
+</button>
+
+<button class="clear"
+onclick="show('shop')">
+Return to Market
+</button>
+
+`;
+
+}
+
+function finishImprove(){
+
+let issues=scenarioCheck();
+let req=requirements();
+
+let missing=
+Object.entries(req)
+.filter(x=>!x[1])
+.map(x=>({
+main:'main dish',
+side:'side',
+produce:'fruit or vegetable',
+drink:'drink',
+dessert:'dessert'
+}[x[0]]));
+
+if(
+total()>scenarioBudget()||
+missing.length||
+issues.length
+){
+
+alert(
+'Your basket still needs changes. Check the scenario requirements and try again.'
+);
+
+return;
+
+}
+
+document.getElementById('improveBox')
+.innerHTML=
+`
+
+<div class="success">
+
+<div class="big">
+Great work!
+</div>
+
+<p>
+You redesigned your basket to respond to the
+<b>${activeScenario.title}</b>
+challenge.
+</p>
+
+<p>
+
+<b>Final total:</b>
+${money(total())}
+
+<br>
+
+<b>Money remaining:</b>
+${money(scenarioBudget()-total())}
+
+</p>
+
+<p>
+Be ready to explain what you changed and why.
+</p>
+
+</div>
+
+<button class="checkout"
+onclick="show('shop')">
+Start a New Basket →
+</button>
+
+`;
+
+}
+
+render();
+
+</script>
+
+</body>
+</html>
